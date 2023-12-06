@@ -2,25 +2,30 @@ import { Order, TUser } from "./user.interface";
 import { User } from "./user.model";
 
 export const createUserIntoDB = async (user: TUser) => {
-  const result = await User.create(user);
+  const { password, _id, ...result } = (await User.create(user)).toObject();
   return result;
 };
 
 export const getAllUserFromDB = async () => {
   const result = await User.find(
     {},
-    { username: 1, fullName: 1, age: 1, email: 1, address: 1 }
+    { username: 1, fullName: 1, age: 1, email: 1, address: 1, _id: 0 }
   );
   return result;
 };
 
 export const getSingleUserFromDB = async (userId: number) => {
-  const result = await User.findOne({ userId });
+  const result = await User.findOne(
+    { userId },
+    { password: 0, _id: 0, orders: 0, __v: 0 }
+  );
   return result;
 };
 
 export const updateSingleUserFromDB = async (user: TUser, userId: number) => {
-  const result = await User.findOneAndUpdate({ userId }, user, { new: true });
+  const result = await User.findOneAndUpdate({ userId }, user, {
+    new: true,
+  }).select({ password: 0, __v: 0, orders: 0, _id: 0 });
   return result;
 };
 export const deleteUserFromDB = async (userId: number) => {
@@ -69,10 +74,10 @@ export const getTotalPriceFromDB = async (userId: number) => {
     },
 
     {
-      $project:{
-        _id:0
-      }
-    }
+      $project: {
+        _id: 0,
+      },
+    },
   ]);
   return result;
 };

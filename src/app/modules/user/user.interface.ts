@@ -19,7 +19,7 @@ export interface TUser {
     city: string;
     country: string;
   };
-  orders?: Types.DocumentArray<Order>;
+  orders?: [Order];
 }
 
 export interface TUserMethods {

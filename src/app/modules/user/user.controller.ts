@@ -18,8 +18,8 @@ export const createUser = async (req: Request, res: Response) => {
   try {
     // validate with zod
     const zodParsData = userValidationSchema.parse(user);
-    const result = await createUserIntoDB(zodParsData);
-    const { password, ...data } = result.toObject();
+    const data = await createUserIntoDB(zodParsData);
+    // const { password, orders, _id, ...data } = result.toObject();
     res
       .status(200)
       .send({ success: true, message: "User created successfully!", data });
@@ -32,6 +32,7 @@ export const createUser = async (req: Request, res: Response) => {
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const data = await getAllUserFromDB();
+
     res
       .status(200)
       .send({ success: true, message: "User feached successfully!", data });
@@ -56,13 +57,11 @@ export const getSingleUser = async (req: Request, res: Response) => {
   }
 
   try {
-    const result = await getSingleUserFromDB(userId);
-    const { ...data } = result?.toObject();
-    const { password, ...filteredData } = data;
+    const data = await getSingleUserFromDB(userId);
     res.status(200).send({
       success: true,
       message: "User feached successfully!",
-      data: filteredData,
+      data: data,
     });
   } catch (error: any) {
     res.status(500).send({ success: false, error: error.message, data: null });
@@ -74,7 +73,7 @@ export const updateSingleUser = async (req: Request, res: Response) => {
   const updatedUser = req.body;
   const userId = parseInt(req.params.userId);
   const user = new User();
-  if (await user.isUserExist(userId)) {
+  if (! await user.isUserExist(userId)) {
     return res.status(404).send({
       success: false,
       message: "User not found",
@@ -86,24 +85,21 @@ export const updateSingleUser = async (req: Request, res: Response) => {
   }
   try {
     const jodParsData = userValidationSchema.parse(updatedUser);
-    const updatedData = await updateSingleUserFromDB(jodParsData, userId);
-    const { ...data } = updatedData?.toObject();
-    const { password, ...filteredData } = data;
+    const data = await updateSingleUserFromDB(jodParsData, userId);
     res.status(200).send({
       success: true,
       message: "User updated  successfully!",
-      data: filteredData,
+      data: data,
     });
   } catch (error: any) {
     res.status(500).send({ success: false, error: error.message, data: null });
   }
 };
 
-
 export const deleteUser = async (req: Request, res: Response) => {
   const userId = parseInt(req.params.userId);
   const user = new User();
-  if (await user.isUserExist(userId)) {
+  if (! await user.isUserExist(userId)) {
     return res.status(404).send({
       success: false,
       message: "User not found",
