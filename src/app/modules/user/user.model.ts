@@ -46,7 +46,7 @@ const userSchema = new Schema<TUser,UserModel,TUserMethods>({
 userSchema.pre("save", async function (next) {
   const user = this;
 
-  // console.log("pass",user,"sol", config.salt_rounds);
+ 
   user.password =  await bcrypt.hash(user.password, Number(config.salt_rounds));
   next();
 });
@@ -62,9 +62,6 @@ userSchema.method("isUserExist",function isUserExist (userId){
   return User.findOne({userId});
 
 })
-// Create a new Model type that khows about TUser methods
-// userSchema.methods.isUserExist = async (userId:string) => {
-//   return User.findOne({userId})
-//}
+
 
 export const User = model<TUser,UserModel>("users", userSchema);

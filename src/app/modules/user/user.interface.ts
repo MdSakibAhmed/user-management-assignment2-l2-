@@ -13,7 +13,7 @@ export interface TUser {
   age: number;
   email: string;
   isActive: boolean;
-  hobbies: Types.Array<string>;
+  hobbies: string[];
   address: {
     street: string;
     city: string;

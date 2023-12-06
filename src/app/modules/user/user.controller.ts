@@ -10,36 +10,41 @@ import {
   getTotalPriceFromDB,
 } from "./user.service";
 import { User } from "./user.model";
+import { orderValidationSchema, userValidationSchema } from "./user.validation";
 
+// create a new user into collection
 export const createUser = async (req: Request, res: Response) => {
   const user = req.body;
-  console.log(user);
   try {
-    const result = await createUserIntoDB(user);
+    // validate with zod
+    const zodParsData = userValidationSchema.parse(user);
+    const result = await createUserIntoDB(zodParsData);
     const { password, ...data } = result.toObject();
     res
       .status(200)
       .send({ success: true, message: "User created successfully!", data });
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    res.status(500).send({ success: false, error: error.message, data: null });
   }
 };
 
+// get all users from collection
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const data = await getAllUserFromDB();
     res
       .status(200)
       .send({ success: true, message: "User feached successfully!", data });
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    res.status(500).send({ success: false, error: error.message, data: null });
   }
 };
 
+// get a single user by userId from users
 export const getSingleUser = async (req: Request, res: Response) => {
   const userId = parseInt(req.params.userId);
   const user = new User();
-  if (!  await user.isUserExist(userId)) {
+  if (!(await user.isUserExist(userId))) {
     return res.status(404).send({
       success: false,
       message: "User not found",
@@ -59,11 +64,12 @@ export const getSingleUser = async (req: Request, res: Response) => {
       message: "User feached successfully!",
       data: filteredData,
     });
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    res.status(500).send({ success: false, error: error.message, data: null });
   }
 };
 
+// update a single user info
 export const updateSingleUser = async (req: Request, res: Response) => {
   const updatedUser = req.body;
   const userId = parseInt(req.params.userId);
@@ -79,7 +85,8 @@ export const updateSingleUser = async (req: Request, res: Response) => {
     });
   }
   try {
-    const updatedData = await updateSingleUserFromDB(updatedUser, userId);
+    const jodParsData = userValidationSchema.parse(updatedUser);
+    const updatedData = await updateSingleUserFromDB(jodParsData, userId);
     const { ...data } = updatedData?.toObject();
     const { password, ...filteredData } = data;
     res.status(200).send({
@@ -87,10 +94,11 @@ export const updateSingleUser = async (req: Request, res: Response) => {
       message: "User updated  successfully!",
       data: filteredData,
     });
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    res.status(500).send({ success: false, error: error.message, data: null });
   }
 };
+
 
 export const deleteUser = async (req: Request, res: Response) => {
   const userId = parseInt(req.params.userId);
@@ -112,8 +120,8 @@ export const deleteUser = async (req: Request, res: Response) => {
       message: "User deleted  successfully!",
       data: null,
     });
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    res.status(500).send({ success: false, error: error.message, data: null });
   }
 };
 
@@ -124,7 +132,7 @@ export const createOrder = async (req: Request, res: Response) => {
   try {
     // check user is exist or not
     const user = new User();
-    if ( ! await user.isUserExist(userId)) {
+    if (!(await user.isUserExist(userId))) {
       return res.status(404).send({
         success: false,
         message: "User not found",
@@ -134,24 +142,25 @@ export const createOrder = async (req: Request, res: Response) => {
         },
       });
     }
-    const result = await createOrderIntoDB(userId, order);
+    const jodParData = orderValidationSchema.parse(order);
+    const result = await createOrderIntoDB(userId, jodParData);
     res.status(200).send({
       success: true,
       message: "Order created successfully!",
       data: null,
     });
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    res.status(500).send({ success: false, error: error.message, data: null });
   }
 };
 
 export const getAllOrder = async (req: Request, res: Response) => {
   const userId = parseInt(req.params.userId);
-  console.log("userId",userId);
+  console.log("userId", userId);
   try {
     // check user is exist or not
     const user = new User();
-    if ( ! await user.isUserExist(userId)) {
+    if (!(await user.isUserExist(userId))) {
       return res.status(404).send({
         success: false,
         message: "User not found",
@@ -167,17 +176,21 @@ export const getAllOrder = async (req: Request, res: Response) => {
     res
       .status(200)
       .send({ success: true, message: "Order feached successfully!", data });
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    res.status(500).send({ success: false, error: error.message, data: null });
   }
 };
 
 export const getTotalPrice = async (req: Request, res: Response) => {
   const userId = parseInt(req.params.userId);
-  const total = await getTotalPriceFromDB(userId);
-  res.send({
-    success: true,
-    message: "Total price calculated successfully!",
-    data: total[0],
-  });
+  try {
+    const total = await getTotalPriceFromDB(userId);
+    res.send({
+      success: true,
+      message: "Total price calculated successfully!",
+      data: total[0],
+    });
+  } catch (error: any) {
+    res.status(500).send({ success: false, error: error.message, data: null });
+  }
 };
