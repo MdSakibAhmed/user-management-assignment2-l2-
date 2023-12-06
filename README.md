@@ -11,4 +11,6 @@ navigate to the downloaded folder and run
 run 
  npm run dev 
 
+ Thats it .
+
 
