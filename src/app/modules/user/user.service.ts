@@ -36,10 +36,36 @@ export const createOrderIntoDB = async (userId: number, order: Order) => {
 };
 
 export const getAllorderFromDB = async (userId: number) => {
-  const result = await User.find({ userId }, { orders: 1 });
+  const result = await User.findOne({ userId }, { orders: 1, _id: 0 });
   return result;
 };
 
-export const getTotalPriceFromDB = async (userId:number)=> {
-  
-}
+export const getTotalPriceFromDB = async (userId: number) => {
+  const result = await User.aggregate([
+    // stage 1
+    {
+      $match: { userId },
+    },
+    //stage 2
+    {
+      $project: {
+        orders: 1,
+        _id: 0,
+      },
+    },
+
+    {
+      $unwind: "$orders",
+    },
+    // stage 3
+    {
+      $group: {
+        _id: "$orders",
+        totalPrice: {
+          $sum: { $multiply: ["$orders.price", "$orders.quantity"] },
+        },
+      },
+    },
+  ]);
+  return result;
+};

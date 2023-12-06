@@ -59,7 +59,7 @@ userSchema.post("save", function (doc) {
 // custom instanc method
 
 userSchema.method("isUserExist",function isUserExist (userId){
-  return User.findOne();
+  return User.findOne({userId});
 
 })
 // Create a new Model type that khows about TUser methods

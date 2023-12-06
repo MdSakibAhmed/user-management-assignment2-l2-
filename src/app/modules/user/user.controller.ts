@@ -7,6 +7,7 @@ import {
   updateSingleUserFromDB,
   createOrderIntoDB,
   getAllorderFromDB,
+  getTotalPriceFromDB,
 } from "./user.service";
 import { User } from "./user.model";
 
@@ -146,10 +147,11 @@ export const createOrder = async (req: Request, res: Response) => {
 
 export const getAllOrder = async (req: Request, res: Response) => {
   const userId = parseInt(req.params.userId);
+  console.log("userId",userId);
   try {
     // check user is exist or not
     const user = new User();
-    if (await user.isUserExist(userId)) {
+    if ( ! await user.isUserExist(userId)) {
       return res.status(404).send({
         success: false,
         message: "User not found",
@@ -170,6 +172,12 @@ export const getAllOrder = async (req: Request, res: Response) => {
   }
 };
 
-export const getTotalPrice = async(req:Request,res:Response) => {
-  
-}
+export const getTotalPrice = async (req: Request, res: Response) => {
+  const userId = parseInt(req.params.userId);
+  const total = await getTotalPriceFromDB(userId);
+  res.send({
+    success: true,
+    message: "Total price calculated successfully!",
+    data: total[0],
+  });
+};
