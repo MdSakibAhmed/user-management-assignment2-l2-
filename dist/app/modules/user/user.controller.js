@@ -8,17 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getTotalPrice = exports.getAllOrder = exports.createOrder = exports.deleteUser = exports.updateSingleUser = exports.getSingleUser = exports.getAllUsers = exports.createUser = void 0;
 const user_service_1 = require("./user.service");
@@ -30,8 +19,8 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         // validate with zod
         const zodParsData = user_validation_1.userValidationSchema.parse(user);
-        const result = yield (0, user_service_1.createUserIntoDB)(zodParsData);
-        const _a = result.toObject(), { password } = _a, data = __rest(_a, ["password"]);
+        const data = yield (0, user_service_1.createUserIntoDB)(zodParsData);
+        // const { password, orders, _id, ...data } = result.toObject();
         res
             .status(200)
             .send({ success: true, message: "User created successfully!", data });
@@ -69,13 +58,11 @@ const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         });
     }
     try {
-        const result = yield (0, user_service_1.getSingleUserFromDB)(userId);
-        const data = __rest(result === null || result === void 0 ? void 0 : result.toObject(), []);
-        const { password } = data, filteredData = __rest(data, ["password"]);
+        const data = yield (0, user_service_1.getSingleUserFromDB)(userId);
         res.status(200).send({
             success: true,
             message: "User feached successfully!",
-            data: filteredData,
+            data: data,
         });
     }
     catch (error) {
@@ -88,7 +75,7 @@ const updateSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
     const updatedUser = req.body;
     const userId = parseInt(req.params.userId);
     const user = new user_model_1.User();
-    if (yield user.isUserExist(userId)) {
+    if (!(yield user.isUserExist(userId))) {
         return res.status(404).send({
             success: false,
             message: "User not found",
@@ -100,13 +87,11 @@ const updateSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
     try {
         const jodParsData = user_validation_1.userValidationSchema.parse(updatedUser);
-        const updatedData = yield (0, user_service_1.updateSingleUserFromDB)(jodParsData, userId);
-        const data = __rest(updatedData === null || updatedData === void 0 ? void 0 : updatedData.toObject(), []);
-        const { password } = data, filteredData = __rest(data, ["password"]);
+        const data = yield (0, user_service_1.updateSingleUserFromDB)(jodParsData, userId);
         res.status(200).send({
             success: true,
             message: "User updated  successfully!",
-            data: filteredData,
+            data: data,
         });
     }
     catch (error) {
@@ -117,7 +102,7 @@ exports.updateSingleUser = updateSingleUser;
 const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = parseInt(req.params.userId);
     const user = new user_model_1.User();
-    if (yield user.isUserExist(userId)) {
+    if (!(yield user.isUserExist(userId))) {
         return res.status(404).send({
             success: false,
             message: "User not found",

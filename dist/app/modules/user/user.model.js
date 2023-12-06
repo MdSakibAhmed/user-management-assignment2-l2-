@@ -25,14 +25,20 @@ const userSchema = new mongoose_1.Schema({
     userId: {
         type: Number,
         required: true,
-    },
-    password: {
-        type: String,
-        required: true
+        unique: true,
     },
     username: {
         type: String,
         required: true,
+        unique: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    fullName: {
+        firstName: { type: String, required: true },
+        lastName: { type: String, required: true },
     },
     age: {
         type: Number,
@@ -46,13 +52,21 @@ const userSchema = new mongoose_1.Schema({
         type: Boolean,
         required: true,
     },
-    hobbies: [String],
+    hobbies: {
+        type: [String],
+        required: true
+    },
     address: {
         street: { type: String, required: true },
         country: { type: String, required: true },
         city: { type: String, required: true },
     },
-    orders: [exports.OrderSchema]
+    orders: {
+        type: [exports.OrderSchema],
+        default: undefined,
+    },
+}, {
+    versionKey: false,
 });
 userSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
