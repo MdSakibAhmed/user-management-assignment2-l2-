@@ -57,15 +57,22 @@ export const getTotalPriceFromDB = async (userId: number) => {
     {
       $unwind: "$orders",
     },
+
     // stage 3
     {
       $group: {
-        _id: "$orders",
+        _id: null,
         totalPrice: {
           $sum: { $multiply: ["$orders.price", "$orders.quantity"] },
         },
       },
     },
+
+    {
+      $project:{
+        _id:0
+      }
+    }
   ]);
   return result;
 };

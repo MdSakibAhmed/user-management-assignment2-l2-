@@ -124,7 +124,7 @@ export const createOrder = async (req: Request, res: Response) => {
   try {
     // check user is exist or not
     const user = new User();
-    if (await user.isUserExist(userId)) {
+    if ( ! await user.isUserExist(userId)) {
       return res.status(404).send({
         success: false,
         message: "User not found",

@@ -1,7 +1,7 @@
-import { Types } from "mongoose";
+import mongoose, { Decimal128, Types } from "mongoose";
 
 
-export type Order = { productName: string; price: number; quantity: number };
+export type Order = { productName: string; price:Number; quantity: number };
 export interface TUser {
   userId: number;
   username: string;
