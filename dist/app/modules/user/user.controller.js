@@ -23,21 +23,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getTotalPrice = exports.getAllOrder = exports.createOrder = exports.deleteUser = exports.updateSingleUser = exports.getSingleUser = exports.getAllUsers = exports.createUser = void 0;
 const user_service_1 = require("./user.service");
 const user_model_1 = require("./user.model");
+const user_validation_1 = require("./user.validation");
+// create a new user into collection
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.body;
-    console.log(user);
     try {
-        const result = yield (0, user_service_1.createUserIntoDB)(user);
+        // validate with zod
+        const zodParsData = user_validation_1.userValidationSchema.parse(user);
+        const result = yield (0, user_service_1.createUserIntoDB)(zodParsData);
         const _a = result.toObject(), { password } = _a, data = __rest(_a, ["password"]);
         res
             .status(200)
             .send({ success: true, message: "User created successfully!", data });
     }
     catch (error) {
-        console.log(error);
+        res.status(500).send({ success: false, error: error.message, data: null });
     }
 });
 exports.createUser = createUser;
+// get all users from collection
 const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = yield (0, user_service_1.getAllUserFromDB)();
@@ -46,14 +50,15 @@ const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             .send({ success: true, message: "User feached successfully!", data });
     }
     catch (error) {
-        console.log(error);
+        res.status(500).send({ success: false, error: error.message, data: null });
     }
 });
 exports.getAllUsers = getAllUsers;
+// get a single user by userId from users
 const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = parseInt(req.params.userId);
     const user = new user_model_1.User();
-    if (yield user.isUserExist(userId)) {
+    if (!(yield user.isUserExist(userId))) {
         return res.status(404).send({
             success: false,
             message: "User not found",
@@ -74,10 +79,11 @@ const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         });
     }
     catch (error) {
-        console.log(error);
+        res.status(500).send({ success: false, error: error.message, data: null });
     }
 });
 exports.getSingleUser = getSingleUser;
+// update a single user info
 const updateSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const updatedUser = req.body;
     const userId = parseInt(req.params.userId);
@@ -93,7 +99,8 @@ const updateSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
         });
     }
     try {
-        const updatedData = yield (0, user_service_1.updateSingleUserFromDB)(updatedUser, userId);
+        const jodParsData = user_validation_1.userValidationSchema.parse(updatedUser);
+        const updatedData = yield (0, user_service_1.updateSingleUserFromDB)(jodParsData, userId);
         const data = __rest(updatedData === null || updatedData === void 0 ? void 0 : updatedData.toObject(), []);
         const { password } = data, filteredData = __rest(data, ["password"]);
         res.status(200).send({
@@ -103,7 +110,7 @@ const updateSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
         });
     }
     catch (error) {
-        console.log(error);
+        res.status(500).send({ success: false, error: error.message, data: null });
     }
 });
 exports.updateSingleUser = updateSingleUser;
@@ -129,7 +136,7 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
     catch (error) {
-        console.log(error);
+        res.status(500).send({ success: false, error: error.message, data: null });
     }
 });
 exports.deleteUser = deleteUser;
@@ -150,7 +157,8 @@ const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 },
             });
         }
-        const result = yield (0, user_service_1.createOrderIntoDB)(userId, order);
+        const jodParData = user_validation_1.orderValidationSchema.parse(order);
+        const result = yield (0, user_service_1.createOrderIntoDB)(userId, jodParData);
         res.status(200).send({
             success: true,
             message: "Order created successfully!",
@@ -158,7 +166,7 @@ const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
     catch (error) {
-        console.log(error);
+        res.status(500).send({ success: false, error: error.message, data: null });
     }
 });
 exports.createOrder = createOrder;
@@ -185,17 +193,22 @@ const getAllOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             .send({ success: true, message: "Order feached successfully!", data });
     }
     catch (error) {
-        console.log(error);
+        res.status(500).send({ success: false, error: error.message, data: null });
     }
 });
 exports.getAllOrder = getAllOrder;
 const getTotalPrice = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = parseInt(req.params.userId);
-    const total = yield (0, user_service_1.getTotalPriceFromDB)(userId);
-    res.send({
-        success: true,
-        message: "Total price calculated successfully!",
-        data: total[0],
-    });
+    try {
+        const total = yield (0, user_service_1.getTotalPriceFromDB)(userId);
+        res.send({
+            success: true,
+            message: "Total price calculated successfully!",
+            data: total[0],
+        });
+    }
+    catch (error) {
+        res.status(500).send({ success: false, error: error.message, data: null });
+    }
 });
 exports.getTotalPrice = getTotalPrice;

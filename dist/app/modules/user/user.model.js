@@ -57,7 +57,6 @@ const userSchema = new mongoose_1.Schema({
 userSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         const user = this;
-        // console.log("pass",user,"sol", config.salt_rounds);
         user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.salt_rounds));
         next();
     });
@@ -69,8 +68,4 @@ userSchema.post("save", function (doc) {
 userSchema.method("isUserExist", function isUserExist(userId) {
     return exports.User.findOne({ userId });
 });
-// Create a new Model type that khows about TUser methods
-// userSchema.methods.isUserExist = async (userId:string) => {
-//   return User.findOne({userId})
-//}
 exports.User = (0, mongoose_1.model)("users", userSchema);
