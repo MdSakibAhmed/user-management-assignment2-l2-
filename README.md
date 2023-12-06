@@ -9,6 +9,6 @@ navigate to the downloaded folder and run
  
 <h2>Step-3</h2>
 run 
-** npm run dev **
+ npm run dev 
 
 
