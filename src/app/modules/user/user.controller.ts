@@ -39,7 +39,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
 export const getSingleUser = async (req: Request, res: Response) => {
   const userId = parseInt(req.params.userId);
   const user = new User();
-  if (await user.isUserExist(userId)) {
+  if (!  await user.isUserExist(userId)) {
     return res.status(404).send({
       success: false,
       message: "User not found",
