@@ -10,7 +10,7 @@ import {
   getTotalPriceFromDB,
 } from "./user.service";
 import { User } from "./user.model";
-import { orderValidationSchema, userValidationSchema } from "./user.validation";
+import { orderValidationSchema, updateValidationSchema, userValidationSchema } from "./user.validation";
 
 // create a new user into collection
 export const createUser = async (req: Request, res: Response) => {
@@ -84,7 +84,7 @@ export const updateSingleUser = async (req: Request, res: Response) => {
     });
   }
   try {
-    const jodParsData = userValidationSchema.parse(updatedUser);
+    const jodParsData = updateValidationSchema.parse(updatedUser);
     const data = await updateSingleUserFromDB(jodParsData, userId);
     res.status(200).send({
       success: true,
