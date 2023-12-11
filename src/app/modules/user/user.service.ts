@@ -25,7 +25,7 @@ export const getSingleUserFromDB = async (userId: number) => {
 export const updateSingleUserFromDB = async (user: Partial<TUser>, userId: number) => {
   const result = await User.findOneAndUpdate({ userId }, user, {
     new: true,
-  }).select({ password: 0, __v: 0, orders: 0, _id: 0 });
+  }).select({ password: 0, orders: 0, _id: 0 });
   return result;
 };
 export const deleteUserFromDB = async (userId: number) => {
